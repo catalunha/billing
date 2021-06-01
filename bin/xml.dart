@@ -76,13 +76,13 @@ class Atendimentos {
     if (json['atendimento'] != null) {
       atendimento = <Atendimento>[];
       if (json['atendimento'] is List) {
-        print('atendimento é lista');
-        print(json['atendimento'].length);
+        // print('atendimento é lista');
+        // print(json['atendimento'].length);
         json['atendimento'].forEach((v) {
           atendimento.add(Atendimento().fromJson(v));
         });
       } else {
-        print('atendimento nao é lista');
+        // print('atendimento nao é lista');
         atendimento.add(Atendimento().fromJson(json['atendimento']));
       }
     }
@@ -185,13 +185,13 @@ class Despesas {
 
       despesa = <Despesa>[];
       if (json['despesa'] is List) {
-        print('despesa é lista');
-        print(json['despesa'].length);
+        // print('despesa é lista');
+        // print(json['despesa'].length);
         json['despesa'].forEach((v) {
           despesa.add(Despesa().fromJson(v));
         });
       } else {
-        print('despesa nao é lista');
+        // print('despesa nao é lista');
         despesa.add(Despesa().fromJson(json['despesa']));
       }
     }

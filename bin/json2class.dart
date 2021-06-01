@@ -18,10 +18,78 @@ KKKFD10
 
 void main(List<String> arguments) {
   // conferirXML();
-  analisePagtoMarkdown();
+  // analisePagtoMarkdown();
+  analisePagtoCSV();
 }
 
-analisePagtoCSV() {}
+void analisePagtoCSV() async {
+  // var file = 'K3AAD10';
+  // var file = 'KKKFD10a';
+  var file = 'KLNFD10a';
+  // var file = 'KTGFD10a';
+  var path = '/home/catalunha/gdrive/iza/Fatura/FaturaBH';
+  print('$path/$file.json');
+  late Billing billing;
+  await File('$path/$file.json').readAsString().then((String contents) async {
+    var jsonData = jsonDecode(contents);
+    var teste = Teste().fromJson(jsonData);
+    billing = Billing(
+      numero: teste.lote.faturas.fatura.numero,
+      data: teste.lote.faturas.fatura.data,
+    );
+    teste.lote.faturas.fatura.atendimentos.atendimento.forEach((atendimento) {
+      atendimento.despesas.despesa.forEach((despesa) {
+        if (!billing.billExecutante.containsKey(despesa.executante.cpf)) {
+          billing.billExecutante.addAll({
+            despesa.executante.cpf: BillingExecutante(
+              cpf: despesa.executante.cpf,
+              nome: despesa.executante.nome,
+            )
+          });
+        }
+        billing.billExecutante[despesa.executante.cpf]!.paciente.addAll({
+          atendimento.matricula: BillingPaciente(
+            nome: atendimento.nomePaciente,
+            matricula: atendimento.matricula,
+            senha: atendimento.senha,
+            valorTotal: despesa.valorTotal,
+          )
+        });
+
+        // }
+      });
+    });
+  });
+
+  print(billing.numero);
+  print(billing.data);
+  var rel = '';
+  rel += 'Fatura: ${billing.numero}\n';
+  rel += 'Data da Fatura: ${billing.data}\n\n';
+  rel += 'Executante,Paciente,Senha,ValorTotal,\n';
+  rel += '---,---,---,---\n';
+  billing.billExecutante.forEach((key, value) {
+    // print(key);
+    // print(value.cpf);
+    rel += '${value.nome} CPF: ${value.cpf},,,\n';
+    var soma = 0;
+    value.paciente.forEach((key, value) {
+      // print(key);
+      rel +=
+          ',${value.nome} CPF: ${value.matricula},${value.senha},${value.valorTotal}\n';
+      soma += int.parse(value.valorTotal.replaceAll('.', ''));
+      // print(value.matricula);
+      // print(value.senha);
+      // print(value.valorTotal);
+    });
+    rel += '${value.nome} CPF: ${value.cpf},,,${soma / 100}\n';
+  });
+
+  await File('docs/$file.csv')
+      .writeAsString(rel)
+      .then((value) => print('Convert finalized'));
+}
+
 void analisePagtoMarkdown() async {
   var file = 'K3AAD10';
   // var file = 'KKKFD10a';
